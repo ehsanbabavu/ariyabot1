@@ -1,0 +1,133 @@
+AI Prompt: Modern Persian E-commerce & Support Web Application
+Project Title: Modern Persian Web Application with Admin Panel, User Management, Ticketing, and Inventory
+
+Core Requirement: All item names, labels, menu options, and user-facing text in the front-end must be in Persian (Farsi). The database can store data in any format, but the UI must be fully Persian.
+
+Technology Stack (Suggestion): Please use the MERN stack (MongoDB, Express.js, React.js, Node.js) for a modern, full-stack JavaScript application. The front-end should use a modern component library like Material-UI, Ant Design, or Tailwind CSS for a sleek and professional look.
+
+1. Authentication System (/login, /register)
+A. Registration Page (/register)
+
+Form Fields (Labels in Persian):
+
+نام (First Name) - Text Input, required.
+
+نام خانوادگی (Last Name) - Text Input, required.
+
+ایمیل (Email) - Email Input, required.
+
+شماره تلفن (Phone Number) - Tel Input, required.
+
+رمز عبور (Password) - Password Input, required.
+
+تکرار رمز عبور (Confirm Password) - Password Input, required.
+
+OAuth Registration: A prominent button for "ثبت نام با گوگل" (Sign up with Google).
+
+B. Login Page (/login)
+
+Form Fields (Labels in Persian):
+
+ایمیل (Email) - Email Input, required.
+
+رمز عبور (Password) - Password Input, required.
+
+OAuth Login: A prominent button for "ورود با گوگل" (Login with Google).
+
+Default Admin Account: Pre-create one admin user in the database:
+
+Username/Email: ehsan
+
+Password: 232111
+
+C. User Roles: Three distinct user roles must be implemented:
+
+admin (مدیر)
+
+user_level_1 (کاربر سطح ۱)
+
+user_level_2 (کاربر سطح ۲)
+
+2. Dashboard Layout
+A consistent dashboard layout for all user roles after login.
+
+Right Side: Main content area for displaying pages.
+
+Left Side: A vertical navigation menu (منو) with all items in Persian.
+
+Top Bar: Displays the user's profile picture and their phone number (شماره موبایل).
+
+3. Admin Panel Features (admin role)
+The admin's left-side menu should contain:
+
+مدیریت کاربران (User Management): A page with a data table of all users.
+
+Functionality: Add (افزودن), Edit (ویرایش), Delete (حذف), and Search (جستجو) users.
+
+Ability to assign/change user roles.
+
+مدیریت تیکت ها (Ticket Management): A page to view all tickets.
+
+View Filters: Display tickets in categories: خوانده شده (Read), خوانده نشده (Unread), بسته شده (Closed).
+
+Functionality: Admin can reply to (پاسخ) a ticket, which changes its status. Delete (حذف) tickets.
+
+Auto-Close: If a user does not reply to an admin's response within 48 hours (2 days), the ticket status automatically changes to بسته شده (Closed). Users cannot delete tickets.
+
+اشتراک ها (Subscriptions): A page to manage subscriptions for user_level_1 and user_level_2.
+
+Add Subscription Form: Fields for نام اشتراک (Subscription Name), توضیحات (Description), and a dropdown to select which user level it applies to.
+
+Display: List all subscriptions in a modern card layout, showing 2 cards per row.
+
+4. User Panel Features (user_level_1, user_level_2)
+The user's left-side menu should contain:
+
+اطلاعات کاربری (User Profile):
+
+Functionality to change نام (First Name) and نام خانوادگی (Last Name).
+
+Functionality to upload a profile picture. The image must be stored directly and displayed on the profile and in the top bar.
+
+ارسال تیکت (Send Ticket): A form for users to submit a new support ticket to the administration.
+
+انبار (Inventory): A menu for product management.
+
+افزودن محصول (Add Product): A form with these fields (Labels in Persian):
+
+عکس محصول (Product Image) - File upload.
+
+نام محصول (Product Name) - Text Input.
+
+تعداد (Quantity) - Number Input.
+
+قیمت قبل تخفیف (Price Before Discount) - Number Input.
+
+قیمت بعد تخفیف (Price After Discount) - Number Input.
+
+توضیحات (Description) - Textarea.
+
+لیست محصولات (Product List): A data table listing all products added by this user.
+
+Functionality: Edit (ویرایش), Delete (حذف), Search (جستجو).
+
+A toggle switch (فعال/غیرفعال) for each product to activate/deactivate it.
+
+5. WhatsApp Integration Menu
+A menu item for all roles named واتس اپ (WhatsApp).
+
+Submenu: تنظیمات واتس اپ (WhatsApp Settings) - Visible only to admin.
+
+Field: توکن (Token) - Input field to store the WhatsApp API token.
+
+Toggle Button: A radio button or switch for فعال سازی (Activate) / غیر فعال سازی (Deactivate) the integration.
+
+6. Technical & Design Requirements
+Database: All user data, including profile pictures, must be stored securely on the server-side.
+
+Design: The entire application must have a modern, advanced, and up-to-date (بروز) user interface. Use a clean, professional color scheme, consistent typography, and smooth animations where appropriate.
+
+Architecture: The application must be a complete full-stack project with a separate, well-structured Back-end (API) and Front-end (Client).
+
+Final Instruction for the AI:
+Please generate the complete codebase for this application, including detailed setup instructions for both the server and client, database schema definitions (preferably for MongoDB with Mongoose), API endpoints, and all React components. Ensure the UI is fully responsive and the code is clean and well-commented.
