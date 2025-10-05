@@ -1,0 +1,75 @@
+Prompt for AI Programming (English with Persian Items):
+
+Create a new submenu item under the WhatsApp menu called "گزارشات" (Reports). This panel must have a two-column layout.
+
+Right Column (گزارشات ارسالی - Sent Reports):
+
+Fetch and display a list of sent messages from a local database table (e.g., sent_messages).
+
+The table should store and display: id, recipient (گیرنده), message (پیام), timestamp (زمان ارسال), and status (وضعیت).
+
+Left Column (گزارشات دریافتی - Received Reports):
+
+Fetch and display a list of received messages. These messages must be stored in a local database table (e.g., received_messages).
+
+The table must include these fields:
+
+id
+
+sender (فرستنده)
+
+message (پیام)
+
+timestamp (زمان دریافت)
+
+status (وضعیت) - Must have two values: "خوانده شده" (read) and "خوانده نشده" (unread). Set the default value to "خوانده نشده".
+
+Key Functionality Requirements:
+
+Real-time Updates: Implement a polling mechanism that checks for new received messages every 5 seconds using the exact WhatsApp API endpoint structure shown below.
+
+API Integration: Use this exact API call format for fetching messages (adapt for JavaScript/React):
+
+javascript
+// Equivalent of the Python code provided
+fetch(`https://api.whatsiplus.com/receivedMessages/${APIKEY}?page=1&phonenumber=1555`)
+Visual Status Indicator: Messages with status "خوانده نشده" must have a light green background (e.g., bg-green-100).
+
+Click Interaction: When a user clicks on a received message:
+
+Its status must update from "خوانده نشده" to "خوانده شده" in the database
+
+The green background must immediately be removed from that message
+
+Please generate complete React/TypeScript code for this "گزارشات" panel including:
+
+All necessary useState and useEffect hooks
+
+Functions for:
+
+fetchSentMessages (from local DB)
+
+fetchReceivedMessages (from local DB)
+
+checkForNewMessages (API polling every 5 seconds)
+
+handleMessageClick (status update)
+
+JSX structure with two columns using Persian headers
+
+Conditional styling for unread messages
+
+The 5-second polling interval for new messages
+
+Sample API Reference (include this in the prompt):
+
+python
+import http.client
+
+conn = http.client.HTTPSConnection("api.whatsiplus.com")
+payload = ''
+headers = {}
+conn.request("GET", "/receivedMessages/APIKEY?page=1&phonenumber=1555", payload, headers)
+res = conn.getresponse()
+data = res.read()
+print(data.decode("utf-8"))
