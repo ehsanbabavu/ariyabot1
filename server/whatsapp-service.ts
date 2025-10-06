@@ -1,5 +1,5 @@
 import { storage } from "./storage";
-import { liaraAIService } from "./liara-ai-service";
+import { openaiService } from "./openai-service";
 import { whatsAppSender } from "./whatsapp-sender";
 import { orderSessionService } from "./order-session-service";
 
@@ -159,7 +159,7 @@ class WhatsAppMessageService {
             // برای پیام‌های متنی
             messageContent = message.message;
             // چک می‌کنیم آیا توی متن لینک عکس هست
-            imageUrl = liaraAIService.extractImageUrl(message.message);
+            imageUrl = openaiService.extractImageUrl(message.message);
             if (imageUrl) {
               console.log(`🖼️ آدرس عکس از متن پیام استخراج شد: ${imageUrl}`);
             }
@@ -190,7 +190,7 @@ class WhatsAppMessageService {
             });
 
             // پاسخ خودکار با Gemini AI فقط اگر کاربر ثبت‌نام کامل شده باشد
-            if (liaraAIService.isActive() && !isUserInRegistrationProcess) {
+            if (openaiService.isActive() && !isUserInRegistrationProcess) {
               await this.handleAutoResponse(message.from, messageContent, message.id, user.id);
             }
             
@@ -282,7 +282,7 @@ class WhatsAppMessageService {
             // برای پیام‌های متنی
             messageContent = message.message;
             // چک می‌کنیم آیا توی متن لینک عکس هست
-            imageUrl = liaraAIService.extractImageUrl(message.message);
+            imageUrl = openaiService.extractImageUrl(message.message);
             if (imageUrl) {
               console.log(`🖼️ آدرس عکس از متن پیام استخراج شد: ${imageUrl}`);
             }
@@ -309,7 +309,7 @@ class WhatsAppMessageService {
             });
 
             // پاسخ خودکار فقط اگر کاربر ثبت‌نام کامل شده باشد
-            if (liaraAIService.isActive() && !isUserInRegistrationProcess) {
+            if (openaiService.isActive() && !isUserInRegistrationProcess) {
               await this.handleAutoResponse(message.from, messageContent, message.id, admin.id);
             }
             
@@ -606,7 +606,7 @@ class WhatsAppMessageService {
       }
 
       // استخراج اطلاعات مالی با هوش مصنوعی
-      const depositInfo = await liaraAIService.extractDepositInfo(message);
+      const depositInfo = await openaiService.extractDepositInfo(message);
       
       // لاگ ساختاریافته برای مانیتورینگ و تلمتری
       console.log(`📊 Telemetry - Deposit extraction attempt:`, JSON.stringify({
@@ -700,7 +700,7 @@ class WhatsAppMessageService {
       }
 
       // استخراج اطلاعات مالی از عکس با هوش مصنوعی
-      const depositInfo = await liaraAIService.extractDepositInfoFromImage(imageUrl);
+      const depositInfo = await openaiService.extractDepositInfoFromImage(imageUrl);
       
       // لاگ ساختاریافته برای مانیتورینگ و تلمتری
       console.log(`📊 Telemetry - Deposit extraction from image:`, JSON.stringify({
@@ -1022,13 +1022,13 @@ ${missingFieldsText}
       // مدیریت state های مختلف
       if (session.state === 'idle') {
         // ابتدا چک کنیم آیا پیام درخواست سفارش است
-        const isOrder = await liaraAIService.isProductOrderRequest(message);
+        const isOrder = await openaiService.isProductOrderRequest(message);
         if (!isOrder) {
           return false; // اگر درخواست سفارش نبود، ادامه ندهیم
         }
 
         // استخراج نام محصول
-        const productName = await liaraAIService.extractProductName(message);
+        const productName = await openaiService.extractProductName(message);
         if (!productName) {
           await this.sendWhatsAppMessage(whatsappToken, sender, 'متوجه نشدم چه محصولی می‌خواهید. لطفاً نام محصول را واضح‌تر بنویسید.');
           return true;
@@ -1075,7 +1075,7 @@ ${missingFieldsText}
       
       else if (session.state === 'asking_quantity') {
         // استخراج تعداد از پیام
-        const quantity = await liaraAIService.extractQuantity(message);
+        const quantity = await openaiService.extractQuantity(message);
         if (!quantity || quantity <= 0) {
           await this.sendWhatsAppMessage(whatsappToken, sender, 'لطفاً تعداد را به صورت عدد بنویسید. مثلاً: 2 یا سه');
           return true;
@@ -1119,7 +1119,7 @@ ${missingFieldsText}
       
       else if (session.state === 'asking_more_products') {
         // بررسی پاسخ کاربر
-        const wantsMore = await liaraAIService.isPositiveResponse(message);
+        const wantsMore = await openaiService.isPositiveResponse(message);
         
         if (wantsMore) {
           // کاربر محصول دیگری می‌خواهد
@@ -1254,7 +1254,7 @@ ${missingFieldsText}
       console.log(`🤖 در حال تولید پاسخ برای پیام از ${sender}...`);
       
       // ابتدا بررسی کنیم که آیا پیام حاوی عکس است
-      const imageUrl = liaraAIService.extractImageUrl(incomingMessage);
+      const imageUrl = openaiService.extractImageUrl(incomingMessage);
       
       if (imageUrl) {
         console.log(`🖼️ پیام حاوی عکس است، در حال پردازش عکس رسید...`);
@@ -1273,7 +1273,7 @@ ${missingFieldsText}
       }
       
       // اگر عکس نبود یا عکس واریزی نبود، چک کنیم که آیا پیام یک رسید واریزی متنی است
-      const isDeposit = await liaraAIService.isDepositMessage(incomingMessage);
+      const isDeposit = await openaiService.isDepositMessage(incomingMessage);
       if (isDeposit) {
         console.log(`💰 پیام تشخیص داده شد به عنوان رسید واریزی متنی`);
         const depositProcessed = await this.handleDepositMessage(sender, incomingMessage, userId);
@@ -1326,7 +1326,7 @@ ${missingFieldsText}
           console.log(`📋 ${parentFaqs.length} سوال متداول از والد پیدا شد`);
           
           // یافتن FAQ منطبق با سوال کاربر
-          const matchedFaq = await liaraAIService.findMatchingFaq(
+          const matchedFaq = await openaiService.findMatchingFaq(
             incomingMessage,
             parentFaqs.map(faq => ({ id: faq.id, question: faq.question, answer: faq.answer }))
           );
@@ -1381,7 +1381,7 @@ ${missingFieldsText}
 
       console.log(`🤖 هیچ FAQ یا سفارشی یافت نشد، در حال تولید پاسخ هوشمند...`);
       // تولید پاسخ با Gemini AI
-      const aiResponse = await liaraAIService.generateResponse(incomingMessage, userId);
+      const aiResponse = await openaiService.generateResponse(incomingMessage, userId);
 
       // محدود کردن طول پاسخ برای جلوگیری از خطای 414
       const maxLength = 200; // حداکثر 200 کاراکتر
@@ -1426,7 +1426,7 @@ ${missingFieldsText}
     return {
       isRunning: this.isRunning,
       lastFetchTime: this.lastFetchTime,
-      geminiActive: liaraAIService.isActive()
+      geminiActive: openaiService.isActive()
     };
   }
 }

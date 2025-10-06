@@ -1047,9 +1047,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertAiTokenSettingsSchema.parse(req.body);
       const settings = await storage.updateAiTokenSettings(validatedData);
       
-      // بازخوانی سرویس Liara AI با توکن جدید
-      const { liaraAIService } = await import("./liara-ai-service");
-      await liaraAIService.reinitialize();
+      // بازخوانی سرویس OpenAI با توکن جدید
+      const { openaiService } = await import("./openai-service");
+      await openaiService.reinitialize();
       
       res.json(settings);
     } catch (error) {

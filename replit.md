@@ -25,7 +25,7 @@ Preferred communication style: Simple, everyday language.
 - **Authentication**: JWT-based with bcrypt for password hashing
 - **Middleware**: Custom authentication and request logging
 - **Feature Specifications**:
-    - **WhatsApp Integration**: AI-powered deposit receipt processing (OCR with Gemini Vision), smart product ordering with session management, duplicate transaction detection, and automated user notifications for transaction status.
+    - **WhatsApp Integration**: AI-powered deposit receipt processing (OCR with OpenAI Vision via Liara AI), smart product ordering with session management, duplicate transaction detection, and automated user notifications for transaction status.
     - **Internal Chat**: Unread message badge system with real-time updates and role-based display.
     - **Order Management**: Enhanced order display for level 1 users with customer details, notification bell for new orders, and unshipped orders dashboard.
     - **Transaction Management**: Comprehensive duplicate transaction detection and automatic WhatsApp notifications for approval/rejection.
@@ -68,7 +68,7 @@ Preferred communication style: Simple, everyday language.
 - **Authentication**: JWT, bcrypt
 
 ## AI Services
-- **Gemini AI**: For intelligent deposit receipt OCR (Gemini 2.0 Flash Vision) and natural language understanding for WhatsApp product ordering.
+- **OpenAI via Liara AI**: For intelligent deposit receipt OCR (Vision) and natural language understanding for WhatsApp product ordering. Using Liara AI service as an Iranian proxy with hardcoded API credentials for access to OpenAI models (google/gemini-2.5-flash).
 
 ## Database and Storage
 - **Database Provider**: Neon Database
