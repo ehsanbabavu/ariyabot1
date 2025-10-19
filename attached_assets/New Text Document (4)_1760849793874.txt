@@ -1,0 +1,90 @@
+فارسی صحبت کن ، لطفا هوش مصنوعی رو مستنداشو به این سورس تغییر بده
+// npm install openai
+                
+const OpenAI = require('openai');
+
+const openai = new OpenAI({
+  baseURL: '<https://ai.liara.ir/api/68e204eb1008fc6ccd20c83d/v1>',
+  apiKey: '<eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiI2OGY0NmUxNjI3OTVlZmFhYmMwNzU4NTYiLCJ0eXBlIjoiYWlfa2V5IiwiaWF0IjoxNzYwODQ5NDMwfQ.dKDlmaq4jJ1H1ewGw5Pd6XlnPK2pWmqc7fj48F0JKJ8>',
+});
+
+async function main() {
+  const completion = await openai.chat.completions.create({
+    model: '<google/gemini-2.5-flash>',
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  });
+
+  console.log(completion.choices[0].message);
+}
+
+main();
+
+تمام دستورات تو کل برنامه رو بررسی کن و تغییر بده
+
+سورس ارسا عکس به عنوان ورودی 
+// npm install openai
+                
+const OpenAI = require('openai');
+// const { config } = require('dotenv');
+// config();
+
+const openai = new OpenAI({
+  baseURL: 'https://ai.liara.ir/api/68e204eb1008fc6ccd20c83d/v1',
+  apiKey: '<eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiI2OGY0NmUxNjI3OTVlZmFhYmMwNzU4NTYiLCJ0eXBlIjoiYWlfa2V5IiwiaWF0IjoxNzYwODQ5NDMwfQ.dKDlmaq4jJ1H1ewGw5Pd6XlnPK2pWmqc7fj48F0JKJ8>',
+});
+
+async function main() {
+  const completion = await openai.chat.completions.create({
+    model: 'google/gemini-2.5-flash',
+    messages: [
+        {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Describe the images in detail."
+        },
+        {
+          "type": "image_url",
+          "image_url": {"url": "https://media.liara.ir/ai/dog.png"}
+        }
+      ]
+    }
+    ],
+  });
+
+  console.log(completion.choices[0].message);
+}
+
+main();
+
+سورس ارسال متن به عنوان ورودی 
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  baseURL: 'https://ai.liara.ir/api/68e204eb1008fc6ccd20c83d/v1',
+  apiKey: '<eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiI2OGY0NmUxNjI3OTVlZmFhYmMwNzU4NTYiLCJ0eXBlIjoiYWlfa2V5IiwiaWF0IjoxNzYwODQ5NDMwfQ.dKDlmaq4jJ1H1ewGw5Pd6XlnPK2pWmqc7fj48F0JKJ8>',
+});
+
+async function main() {
+  const completion = await openai.chat.completions.create({
+    model: 'google/gemini-2.5-flash',
+    messages: [
+      {
+        role: 'user',
+        content: 'معنای زندگی چیست؟',
+      },
+    ],
+  });
+
+  console.log(completion.choices[0].message);
+}
+
+main();
+
+لطفا  apikey رو مستقیم تو سورس برنامه قرار بده
