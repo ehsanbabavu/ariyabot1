@@ -3,7 +3,7 @@ import { storage } from "./storage";
 
 export class LiaraService {
   private openai: OpenAI | null = null;
-  private model: string = "google/gemini-2.5-flash";
+  private model: string = "google/gemini-2.0-flash-001";
 
   constructor() {
     this.initialize();

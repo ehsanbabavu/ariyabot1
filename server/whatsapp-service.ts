@@ -1585,13 +1585,6 @@ ${missingFieldsText}
       }
 
       // ۳. اولویت سوم: پاسخ عادی هوش مصنوعی (AI Fallback)
-      // دریافت تنظیمات هوش مصنوعی
-      const aiTokenSettings = await storage.getAiTokenSettings();
-      if (!aiTokenSettings?.token || !aiTokenSettings.isActive) {
-        console.log("⚠️ توکن هوش مصنوعی تنظیم نشده یا غیرفعال است");
-        return;
-      }
-
       console.log(`🤖 هیچ FAQ یا سفارشی یافت نشد، در حال تولید پاسخ هوشمند...`);
       // تولید پاسخ با Gemini AI
       const aiResponse = await aiService.generateResponse(incomingMessage, userId);
