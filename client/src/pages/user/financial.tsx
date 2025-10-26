@@ -83,6 +83,7 @@ const depositWithdrawSchema = z.object({
 export default function FinancialPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [formattedAmount, setFormattedAmount] = useState('');
   const itemsPerPage = 7;
   
   // Fetch transactions
@@ -158,10 +159,11 @@ export default function FinancialPage() {
     console.log('✅ Form submitted successfully with data:', data);
     console.log('✅ Form errors:', form.formState.errors);
     
-    // Force amount to be string for API
+    // تبدیل ریال به تومان (تقسیم بر 10) و Force amount to be string for API
+    const amountInToman = Math.floor(data.amount / 10);
     const payload = {
       ...data,
-      amount: String(data.amount)
+      amount: String(amountInToman)
     };
     
     console.log('✅ Final payload being sent to server:', payload);
@@ -210,6 +212,7 @@ export default function FinancialPage() {
                 paymentMethod: "card",
                 referenceId: ""
               });
+              setFormattedAmount('');
             }
           }}>
             <DialogTrigger asChild>
@@ -235,13 +238,22 @@ export default function FinancialPage() {
                     name="amount"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>مبلغ (تومان)</FormLabel>
+                        <FormLabel>مبلغ (ریال)</FormLabel>
                         <FormControl>
                           <Input 
-                            type="number"
-                            min="1000"
-                            step="1000"
-                            {...field}
+                            type="text"
+                            value={formattedAmount}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^0-9]/g, '');
+                              const numericValue = value ? parseInt(value, 10) : 0;
+                              
+                              // فرمت کردن عدد با جداکننده 3 رقمی
+                              const formatted = numericValue.toLocaleString('en-US');
+                              setFormattedAmount(formatted === '0' ? '' : formatted);
+                              
+                              // تنظیم مقدار اصلی در فرم
+                              field.onChange(numericValue);
+                            }}
                             placeholder="۰"
                             data-testid="input-amount"
                             className="text-right"

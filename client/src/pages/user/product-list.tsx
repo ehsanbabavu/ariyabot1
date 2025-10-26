@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { DashboardLayout } from "@/components/dashboard-layout";
@@ -21,6 +21,7 @@ export default function ProductList() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categorySortOrder, setCategorySortOrder] = useState<'none' | 'asc' | 'desc'>('none');
+  const [currentPage, setCurrentPage] = useState(1);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editFormData, setEditFormData] = useState({
@@ -61,8 +62,12 @@ export default function ProductList() {
       if (!response.ok) throw new Error("خطا در بروزرسانی محصول");
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+    onSuccess: (updatedProduct: Product) => {
+      // به‌روزرسانی بهینه شده - بدون جابجایی محصولات
+      queryClient.setQueryData(["/api/products"], (oldProducts: Product[] | undefined) => {
+        if (!oldProducts) return [updatedProduct];
+        return oldProducts.map(p => p.id === updatedProduct.id ? updatedProduct : p);
+      });
       toast({
         title: "موفقیت",
         description: "محصول با موفقیت بروزرسانی شد",
@@ -133,8 +138,12 @@ export default function ProductList() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+    onSuccess: (updatedProduct: Product) => {
+      // به‌روزرسانی بهینه شده - بدون جابجایی محصولات
+      queryClient.setQueryData(["/api/products"], (oldProducts: Product[] | undefined) => {
+        if (!oldProducts) return [updatedProduct];
+        return oldProducts.map(p => p.id === updatedProduct.id ? updatedProduct : p);
+      });
       handleEditModalClose();
       toast({
         title: "موفقیت",
@@ -204,6 +213,18 @@ export default function ProductList() {
     }
     return 0; // No sorting
   });
+
+  // صفحه‌بندی - 8 محصول در هر صفحه
+  const itemsPerPage = 8;
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+
+  // برگشت به صفحه 1 وقتی جستجو یا فیلتر تغییر می‌کند
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, statusFilter, categorySortOrder]);
 
   const handleToggleActive = (product: Product) => {
     updateProductMutation.mutate({
@@ -441,7 +462,7 @@ export default function ProductList() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredProducts.map((product) => (
+                    paginatedProducts.map((product) => (
                       <TableRow key={product.id} className="hover:bg-muted/50 transition-colors" data-testid={`row-product-${product.id}`}>
                         <TableCell>
                           {product.image ? (
@@ -547,7 +568,7 @@ export default function ProductList() {
               {search || statusFilter !== "all" ? "محصولی یافت نشد" : "هیچ محصولی اضافه نکرده‌اید"}
             </div>
           ) : (
-            filteredProducts.map((product) => (
+            paginatedProducts.map((product) => (
               <div 
                 key={product.id} 
                 className="bg-card rounded-lg border border-border p-4 space-y-3"
@@ -656,6 +677,45 @@ export default function ProductList() {
             ))
           )}
         </div>
+
+        {/* صفحه‌بندی */}
+        {!isLoading && filteredProducts.length > 0 && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="h-9"
+            >
+              قبلی
+            </Button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(page)}
+                  className="h-9 w-9"
+                >
+                  {page}
+                </Button>
+              ))}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="h-9"
+            >
+              بعدی
+            </Button>
+          </div>
+        )}
 
         {/* Edit Product Modal */}
         <Dialog open={isEditModalOpen} onOpenChange={(open) => { if (!open) handleEditModalClose(); else setIsEditModalOpen(open); }}>
