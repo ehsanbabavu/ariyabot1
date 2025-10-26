@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Ticket, type InsertTicket, type Subscription, type InsertSubscription, type Product, type InsertProduct, type WhatsappSettings, type InsertWhatsappSettings, type SentMessage, type InsertSentMessage, type ReceivedMessage, type InsertReceivedMessage, type AiTokenSettings, type InsertAiTokenSettings, type UserSubscription, type InsertUserSubscription, type Category, type InsertCategory, type Cart, type InsertCart, type CartItem, type InsertCartItem, type Address, type InsertAddress, type Order, type InsertOrder, type OrderItem, type InsertOrderItem, type Transaction, type InsertTransaction, type InternalChat, type InsertInternalChat, type Faq, type InsertFaq, type UpdateFaq, type ShippingSettings, type InsertShippingSettings, type UpdateShippingSettings, type PasswordResetOtp, type InsertPasswordResetOtp, type VatSettings, type InsertVatSettings, type UpdateVatSettings } from "@shared/schema";
+import { type User, type InsertUser, type Ticket, type InsertTicket, type Subscription, type InsertSubscription, type Product, type InsertProduct, type WhatsappSettings, type InsertWhatsappSettings, type SentMessage, type InsertSentMessage, type ReceivedMessage, type InsertReceivedMessage, type AiTokenSettings, type InsertAiTokenSettings, type UserSubscription, type InsertUserSubscription, type Category, type InsertCategory, type Cart, type InsertCart, type CartItem, type InsertCartItem, type Address, type InsertAddress, type Order, type InsertOrder, type OrderItem, type InsertOrderItem, type Transaction, type InsertTransaction, type InternalChat, type InsertInternalChat, type Faq, type InsertFaq, type UpdateFaq, type ShippingSettings, type InsertShippingSettings, type UpdateShippingSettings, type PasswordResetOtp, type InsertPasswordResetOtp, type VatSettings, type InsertVatSettings, type UpdateVatSettings, type LoginLog, type InsertLoginLog } from "@shared/schema";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 
@@ -166,6 +166,11 @@ export interface IStorage {
   getValidPasswordResetOtp(userId: string, otp: string): Promise<PasswordResetOtp | undefined>;
   markOtpAsUsed(id: string): Promise<boolean>;
   deleteExpiredOtps(): Promise<void>;
+  
+  // Login Logs
+  createLoginLog(log: InsertLoginLog): Promise<LoginLog>;
+  getLoginLogs(page?: number, limit?: number): Promise<{ logs: LoginLog[], total: number, totalPages: number }>;
+  getLoginLogsByUser(userId: string): Promise<LoginLog[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -190,6 +195,7 @@ export class MemStorage implements IStorage {
   private shippingSettings: Map<string, ShippingSettings>;
   private passwordResetOtps: Map<string, PasswordResetOtp>;
   private vatSettings: Map<string, VatSettings>;
+  private loginLogs: Map<string, LoginLog>;
 
   constructor() {
     this.users = new Map();
@@ -213,6 +219,7 @@ export class MemStorage implements IStorage {
     this.shippingSettings = new Map();
     this.passwordResetOtps = new Map();
     this.vatSettings = new Map();
+    this.loginLogs = new Map();
     
     // Create default admin user
     this.initializeAdminUser();
@@ -1831,6 +1838,38 @@ export class MemStorage implements IStorage {
         this.passwordResetOtps.delete(id);
       }
     }
+  }
+
+  // Login Logs
+  async createLoginLog(log: InsertLoginLog): Promise<LoginLog> {
+    const id = randomUUID();
+    const newLog: LoginLog = {
+      id,
+      userId: log.userId,
+      username: log.username,
+      ipAddress: log.ipAddress || null,
+      userAgent: log.userAgent || null,
+      loginAt: new Date(),
+    };
+    this.loginLogs.set(id, newLog);
+    return newLog;
+  }
+
+  async getLoginLogs(page: number = 1, limit: number = 50): Promise<{ logs: LoginLog[], total: number, totalPages: number }> {
+    const allLogs = Array.from(this.loginLogs.values()).sort((a, b) => 
+      (b.loginAt?.getTime() || 0) - (a.loginAt?.getTime() || 0)
+    );
+    const total = allLogs.length;
+    const totalPages = Math.ceil(total / limit);
+    const startIndex = (page - 1) * limit;
+    const logs = allLogs.slice(startIndex, startIndex + limit);
+    return { logs, total, totalPages };
+  }
+
+  async getLoginLogsByUser(userId: string): Promise<LoginLog[]> {
+    return Array.from(this.loginLogs.values())
+      .filter(log => log.userId === userId)
+      .sort((a, b) => (b.loginAt?.getTime() || 0) - (a.loginAt?.getTime() || 0));
   }
 }
 

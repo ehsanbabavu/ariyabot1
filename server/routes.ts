@@ -361,6 +361,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: "7d" });
 
+      // ثبت لاگ ورود کاربر
+      try {
+        // دریافت IP address
+        const ipAddress = req.ip || 
+                         req.headers['x-forwarded-for'] as string || 
+                         req.headers['x-real-ip'] as string || 
+                         req.socket.remoteAddress || 
+                         'unknown';
+        
+        // دریافت User Agent
+        const userAgent = req.headers['user-agent'] || 'unknown';
+        
+        await storage.createLoginLog({
+          userId: user.id,
+          username: user.username,
+          ipAddress: ipAddress.toString(),
+          userAgent: userAgent,
+        });
+      } catch (logError) {
+        // اگر ثبت لاگ با خطا مواجه شد، فقط لاگ کنیم و ادامه بدیم
+        console.error("Error creating login log:", logError);
+      }
+
       res.json({ 
         user: { ...user, password: undefined },
         token 
@@ -665,6 +688,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("خطا در حذف کاربر:", error);
       res.status(500).json({ message: "خطا در حذف کاربر" });
+    }
+  });
+
+  // Login Logs Management Routes (Admin only)
+  app.get("/api/admin/login-logs", authenticateToken, requireAdmin, async (req: AuthRequest, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 50;
+      
+      const result = await storage.getLoginLogs(page, limit);
+      res.json(result);
+    } catch (error) {
+      console.error("خطا در دریافت لاگ‌های ورود:", error);
+      res.status(500).json({ message: "خطا در دریافت لاگ‌های ورود" });
     }
   });
 

@@ -2,8 +2,8 @@ import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, sql, desc, and, gte, or, inArray, ne } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { users, tickets, subscriptions, products, whatsappSettings, sentMessages, receivedMessages, aiTokenSettings, userSubscriptions, categories, carts, cartItems, addresses, orders, orderItems, transactions, internalChats, faqs, shippingSettings, passwordResetOtps, vatSettings, contentSections } from "@shared/schema";
-import { type User, type InsertUser, type Ticket, type InsertTicket, type Subscription, type InsertSubscription, type Product, type InsertProduct, type WhatsappSettings, type InsertWhatsappSettings, type SentMessage, type InsertSentMessage, type ReceivedMessage, type InsertReceivedMessage, type AiTokenSettings, type InsertAiTokenSettings, type UserSubscription, type InsertUserSubscription, type Category, type InsertCategory, type Cart, type InsertCart, type CartItem, type InsertCartItem, type Address, type InsertAddress, type Order, type InsertOrder, type OrderItem, type InsertOrderItem, type Transaction, type InsertTransaction, type InternalChat, type InsertInternalChat, type Faq, type InsertFaq, type UpdateFaq, type ShippingSettings, type InsertShippingSettings, type UpdateShippingSettings, type PasswordResetOtp, type InsertPasswordResetOtp, type VatSettings, type InsertVatSettings, type UpdateVatSettings, type ContentSection, type InsertContentSection } from "@shared/schema";
+import { users, tickets, subscriptions, products, whatsappSettings, sentMessages, receivedMessages, aiTokenSettings, userSubscriptions, categories, carts, cartItems, addresses, orders, orderItems, transactions, internalChats, faqs, shippingSettings, passwordResetOtps, vatSettings, contentSections, loginLogs } from "@shared/schema";
+import { type User, type InsertUser, type Ticket, type InsertTicket, type Subscription, type InsertSubscription, type Product, type InsertProduct, type WhatsappSettings, type InsertWhatsappSettings, type SentMessage, type InsertSentMessage, type ReceivedMessage, type InsertReceivedMessage, type AiTokenSettings, type InsertAiTokenSettings, type UserSubscription, type InsertUserSubscription, type Category, type InsertCategory, type Cart, type InsertCart, type CartItem, type InsertCartItem, type Address, type InsertAddress, type Order, type InsertOrder, type OrderItem, type InsertOrderItem, type Transaction, type InsertTransaction, type InternalChat, type InsertInternalChat, type Faq, type InsertFaq, type UpdateFaq, type ShippingSettings, type InsertShippingSettings, type UpdateShippingSettings, type PasswordResetOtp, type InsertPasswordResetOtp, type VatSettings, type InsertVatSettings, type UpdateVatSettings, type ContentSection, type InsertContentSection, type LoginLog, type InsertLoginLog } from "@shared/schema";
 import { type IStorage } from "./storage";
 import bcrypt from "bcryptjs";
 
@@ -1990,6 +1990,55 @@ export class DbStorage implements IStorage {
     } catch (error) {
       console.error("Error updating VAT settings:", error);
       throw error;
+    }
+  }
+
+  // Login Logs
+  async createLoginLog(log: InsertLoginLog): Promise<LoginLog> {
+    try {
+      const result = await db.insert(loginLogs)
+        .values(log)
+        .returning();
+      
+      return result[0];
+    } catch (error) {
+      console.error("Error creating login log:", error);
+      throw error;
+    }
+  }
+
+  async getLoginLogs(page: number = 1, limit: number = 50): Promise<{ logs: LoginLog[], total: number, totalPages: number }> {
+    try {
+      // دریافت تعداد کل
+      const countResult = await db.select({ count: sql<number>`cast(count(*) as integer)` }).from(loginLogs);
+      const total = countResult[0].count;
+      const totalPages = Math.ceil(total / limit);
+      
+      // دریافت لاگ‌ها با صفحه‌بندی
+      const logs = await db
+        .select()
+        .from(loginLogs)
+        .orderBy(desc(loginLogs.loginAt))
+        .limit(limit)
+        .offset((page - 1) * limit);
+      
+      return { logs, total, totalPages };
+    } catch (error) {
+      console.error("Error getting login logs:", error);
+      return { logs: [], total: 0, totalPages: 0 };
+    }
+  }
+
+  async getLoginLogsByUser(userId: string): Promise<LoginLog[]> {
+    try {
+      return await db
+        .select()
+        .from(loginLogs)
+        .where(eq(loginLogs.userId, userId))
+        .orderBy(desc(loginLogs.loginAt));
+    } catch (error) {
+      console.error("Error getting login logs by user:", error);
+      return [];
     }
   }
 

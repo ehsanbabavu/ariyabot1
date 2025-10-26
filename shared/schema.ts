@@ -592,3 +592,18 @@ export const updateContentSectionSchema = createInsertSchema(contentSections).pa
 export type ContentSection = typeof contentSections.$inferSelect;
 export type InsertContentSection = z.infer<typeof insertContentSectionSchema>;
 export type UpdateContentSection = z.infer<typeof updateContentSectionSchema>;
+
+// Login Logs for tracking user logins
+export const loginLogs = pgTable("login_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  username: text("username").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  loginAt: timestamp("login_at").defaultNow(),
+});
+
+export const insertLoginLogSchema = createInsertSchema(loginLogs);
+
+export type LoginLog = typeof loginLogs.$inferSelect;
+export type InsertLoginLog = z.infer<typeof insertLoginLogSchema>;
