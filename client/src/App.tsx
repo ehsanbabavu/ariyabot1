@@ -16,6 +16,7 @@ import Subscriptions from "@/pages/admin/subscriptions";
 import WhatsappSettings from "@/pages/admin/whatsapp-settings";
 import AITokenSettings from "@/pages/admin/ai-token";
 import DatabaseBackup from "@/pages/admin/database-backup";
+import LoginLogs from "@/pages/admin/login-logs";
 import Categories from "@/pages/admin/categories";
 import Profile from "@/pages/user/profile";
 import SendTicket from "@/pages/user/send-ticket";
@@ -209,6 +210,7 @@ function Router() {
       <Route path="/subscriptions" component={() => <AdminRoute component={Subscriptions} />} />
       <Route path="/categories" component={() => <AdminOrLevel1Route component={Categories} />} />
       <Route path="/ai-token" component={() => <AdminRoute component={AITokenSettings} />} />
+      <Route path="/login-logs" component={() => <AdminRoute component={LoginLogs} />} />
       <Route path="/database-backup" component={() => <AdminRoute component={DatabaseBackup} />} />
       <Route path="/content-management" component={() => <AdminRoute component={ContentManagement} />} />
       <Route path="/admin/welcome-message" component={() => <AdminOrLevel1Route component={WelcomeMessage} />} />
