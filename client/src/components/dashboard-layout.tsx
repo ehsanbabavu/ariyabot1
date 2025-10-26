@@ -109,36 +109,39 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
         <header className="bg-card border-b border-border p-4 flex items-center justify-between" data-testid="header-topbar">
-          <div className="flex items-center gap-3 flex-1">
-            {/* Mobile Menu Button */}
+          {/* Mobile: Menu button on right */}
+          <div className="md:hidden">
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden"
               onClick={() => setSidebarOpen(true)}
               data-testid="button-mobile-menu"
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <h1 className="hidden md:block text-xl font-semibold text-foreground" data-testid="text-page-title">{title}</h1>
           </div>
           
-          {/* User Info - Center */}
-          <div className="flex items-center space-x-3 space-x-reverse" data-testid="section-user-info">
-            <Avatar data-testid="img-user-avatar">
-              <AvatarImage src={user?.profilePicture || undefined} />
-              <AvatarFallback>
-                <User className="h-4 w-4" />
-              </AvatarFallback>
-            </Avatar>
-            <div className="hidden sm:block">
-              <p className="text-sm font-medium text-foreground whitespace-nowrap" data-testid="text-user-name">
-                {user?.firstName} {user?.lastName}
-              </p>
-            </div>
+          {/* Desktop: Page Title */}
+          <div className="hidden md:block flex-1">
+            <h1 className="text-xl font-semibold text-foreground" data-testid="text-page-title">{title}</h1>
           </div>
           
           <div className="flex items-center space-x-4 space-x-reverse flex-1 justify-end">
+            {/* User Info - Next to logout */}
+            <div className="flex items-center space-x-3 space-x-reverse" data-testid="section-user-info">
+              <Avatar data-testid="img-user-avatar">
+                <AvatarImage src={user?.profilePicture || undefined} />
+                <AvatarFallback>
+                  <User className="h-4 w-4" />
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-sm font-medium text-foreground whitespace-nowrap" data-testid="text-user-name">
+                  {user?.firstName} {user?.lastName}
+                </p>
+              </div>
+            </div>
+            
             {/* Shopping Cart - Only for level 2 users */}
             {user?.role === "user_level_2" && (
               <DropdownMenu open={cartOpen} onOpenChange={setCartOpen}>

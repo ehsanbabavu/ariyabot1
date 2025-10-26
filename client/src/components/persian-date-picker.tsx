@@ -89,7 +89,8 @@ export function PersianDatePicker({
 
   const handleDateSelect = (date: moment.Moment) => {
     setSelectedDate(date);
-    const gregorianDate = date.format('YYYY-MM-DD');
+    // تبدیل صحیح تاریخ شمسی به میلادی
+    const gregorianDate = moment(date).locale('en').format('YYYY-MM-DD');
     onChange?.(gregorianDate);
     setIsOpen(false);
   };
@@ -161,12 +162,15 @@ export function PersianDatePicker({
       const isCurrentMonth = currentDate.jYear() === displayDate.jYear() && currentDate.jMonth() === displayDate.jMonth();
       const isToday = currentDate.isSame(moment(), 'day');
       const isSelected = selectedDate && currentDate.isSame(selectedDate, 'day');
+      
+      // کپی کردن تاریخ برای جلوگیری از مشکل closure
+      const dateToSelect = moment(currentDate);
 
       days.push(
         <button
           key={currentDate.format('YYYY-MM-DD')}
           type="button"
-          onClick={() => handleDateSelect(moment(currentDate))}
+          onClick={() => handleDateSelect(dateToSelect)}
           data-testid={`day-${currentDate.format('YYYY-MM-DD')}`}
           className={`
             w-8 h-8 text-sm rounded-md transition-colors duration-200
