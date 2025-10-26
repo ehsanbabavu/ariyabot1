@@ -185,10 +185,6 @@ export default function UserManagement() {
     <DashboardLayout title="مدیریت کاربران">
       <div className="space-y-6" data-testid="page-user-management">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground">مدیریت کاربران</h2>
-            <p className="text-sm md:text-base text-muted-foreground">مشاهده و مدیریت تمام کاربران سیستم</p>
-          </div>
           <Button 
             onClick={() => setIsCreateDialogOpen(true)}
             data-testid="button-create-user"

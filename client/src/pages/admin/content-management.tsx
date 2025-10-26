@@ -258,11 +258,6 @@ export default function ContentManagement() {
   return (
     <DashboardLayout title="مدیریت محتوای سایت">
       <div className="p-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">مدیریت محتوای صفحه اصلی</h1>
-          <p className="text-gray-600">محتوای تمام بخش‌های صفحه اصلی سایت را ویرایش کنید</p>
-        </div>
-
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="features">ویژگی‌ها</TabsTrigger>

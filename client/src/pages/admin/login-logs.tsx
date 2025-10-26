@@ -102,7 +102,8 @@ export default function LoginLogs() {
               placeholder="جستجو بر اساس نام کاربری، IP یا مرورگر..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pr-10"
+              className="pr-10 text-right"
+              dir="rtl"
             />
           </div>
           <div className="w-64">
