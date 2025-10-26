@@ -7,6 +7,10 @@ import { cleanupService } from "./cleanup-service";
 import path from "path";
 
 const app = express();
+
+// Trust proxy - برای دریافت صحیح IP واقعی کاربر از طریق پروکسی Replit
+app.set('trust proxy', true);
+
 // JSON parsing middleware - با بررسی content-type و افزایش محدودیت سایز برای فاکتورها
 app.use((req, res, next) => {
   if (req.headers['content-type']?.startsWith('multipart/form-data')) {

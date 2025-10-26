@@ -2007,17 +2007,26 @@ export class DbStorage implements IStorage {
     }
   }
 
-  async getLoginLogs(page: number = 1, limit: number = 50): Promise<{ logs: LoginLog[], total: number, totalPages: number }> {
+  async getLoginLogs(page: number = 1, limit: number = 50): Promise<{ logs: any[], total: number, totalPages: number }> {
     try {
       // دریافت تعداد کل
       const countResult = await db.select({ count: sql<number>`cast(count(*) as integer)` }).from(loginLogs);
       const total = countResult[0].count;
       const totalPages = Math.ceil(total / limit);
       
-      // دریافت لاگ‌ها با صفحه‌بندی
+      // دریافت لاگ‌ها با صفحه‌بندی و join با جدول users برای دریافت نقش کاربر
       const logs = await db
-        .select()
+        .select({
+          id: loginLogs.id,
+          userId: loginLogs.userId,
+          username: loginLogs.username,
+          ipAddress: loginLogs.ipAddress,
+          userAgent: loginLogs.userAgent,
+          loginAt: loginLogs.loginAt,
+          role: users.role,
+        })
         .from(loginLogs)
+        .leftJoin(users, eq(loginLogs.userId, users.id))
         .orderBy(desc(loginLogs.loginAt))
         .limit(limit)
         .offset((page - 1) * limit);

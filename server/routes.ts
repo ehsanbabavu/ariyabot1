@@ -363,11 +363,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // ثبت لاگ ورود کاربر
       try {
-        // دریافت IP address
-        const ipAddress = req.ip || 
-                         req.headers['x-forwarded-for'] as string || 
-                         req.headers['x-real-ip'] as string || 
-                         req.socket.remoteAddress || 
+        // دریافت IP واقعی کاربر - ابتدا هدرهای پروکسی را چک می‌کنیم
+        // x-forwarded-for ممکن است شامل چند IP باشد (client, proxy1, proxy2, ...)
+        // اولین IP همیشه IP واقعی کاربر است
+        const forwardedFor = req.headers['x-forwarded-for'];
+        const ipAddress = (Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor?.split(',')[0]?.trim()) ||
+                         req.headers['x-real-ip'] as string ||
+                         req.ip ||
+                         req.socket.remoteAddress ||
                          'unknown';
         
         // دریافت User Agent
