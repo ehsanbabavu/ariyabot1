@@ -33,7 +33,8 @@ import {
   Truck,
   Receipt,
   Database,
-  FileText
+  FileText,
+  History
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useMenuCountersSimple } from "@/hooks/use-menu-counters";
@@ -78,6 +79,7 @@ export function Sidebar({ onNavigate }: SidebarProps = {}) {
     { path: "/users", label: "مدیریت کاربران", icon: Users },
     { path: "/tickets", label: "مدیریت تیکت‌ها", icon: Ticket },
     { path: "/subscriptions", label: "اشتراک‌ها", icon: Crown },
+    { path: "/login-logs", label: "لاگ‌های ورود", icon: History },
     { path: "/database-backup", label: "پشتیبان‌گیری", icon: Database },
   ];
 
