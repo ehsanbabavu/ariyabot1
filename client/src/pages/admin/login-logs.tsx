@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { PersianDatePicker } from "@/components/persian-date-picker";
 import { createAuthenticatedRequest } from "@/lib/auth";
 import moment from "moment-jalaali";
 
@@ -15,6 +16,7 @@ interface LoginLog {
   ipAddress: string | null;
   userAgent: string | null;
   loginAt: string;
+  role: string | null;
 }
 
 interface LoginLogsResponse {
@@ -25,8 +27,9 @@ interface LoginLogsResponse {
 
 export default function LoginLogs() {
   const [search, setSearch] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
   const [page, setPage] = useState(1);
-  const limit = 50;
+  const limit = 10;
 
   const { data, isLoading } = useQuery<LoginLogsResponse>({
     queryKey: ["/api/admin/login-logs", page, limit],
@@ -39,11 +42,17 @@ export default function LoginLogs() {
     },
   });
 
-  const filteredLogs = data?.logs?.filter(log =>
-    log.username.toLowerCase().includes(search.toLowerCase()) ||
-    log.ipAddress?.includes(search) ||
-    log.userAgent?.toLowerCase().includes(search.toLowerCase())
-  ) || [];
+  const filteredLogs = data?.logs?.filter(log => {
+    const matchesSearch = log.username.toLowerCase().includes(search.toLowerCase()) ||
+      log.ipAddress?.includes(search) ||
+      log.userAgent?.toLowerCase().includes(search.toLowerCase());
+    
+    if (!selectedDate) return matchesSearch;
+    
+    const logDate = moment(log.loginAt).format('jYYYY/jMM/jDD');
+    const selectedDateFormatted = moment(selectedDate).format('jYYYY/jMM/jDD');
+    return matchesSearch && logDate === selectedDateFormatted;
+  }) || [];
 
   const formatDateTime = (dateString: string) => {
     const date = moment(dateString);
@@ -65,16 +74,27 @@ export default function LoginLogs() {
     return "مرورگر دیگر";
   };
 
-  return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">لاگ‌های ورود کاربران</h1>
-            <p className="text-muted-foreground">مشاهده تاریخچه ورود کاربران به سیستم</p>
-          </div>
-        </div>
+  const getRoleName = (role: string | null) => {
+    if (!role) return "نامشخص";
+    
+    switch (role) {
+      case "admin":
+        return "مدیر";
+      case "user_level_1":
+        return "کاربر سطح 1";
+      case "user_level_2":
+        return "کاربر سطح 2";
+      default:
+        return role;
+    }
+  };
 
+  const totalPages = data?.totalPages || 1;
+  const totalRecords = data?.total || 0;
+
+  return (
+    <DashboardLayout title="لاگ‌های ورود کاربران">
+      <div className="space-y-6">
         <div className="flex gap-4 items-center">
           <div className="relative flex-1">
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
@@ -85,7 +105,35 @@ export default function LoginLogs() {
               className="pr-10"
             />
           </div>
+          <div className="w-64">
+            <PersianDatePicker
+              value={selectedDate}
+              onChange={(value) => {
+                setSelectedDate(value);
+                setPage(1);
+              }}
+              placeholder="انتخاب تاریخ..."
+              className="text-right"
+            />
+          </div>
+          {selectedDate && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSelectedDate("");
+                setPage(1);
+              }}
+            >
+              پاک کردن فیلتر
+            </Button>
+          )}
         </div>
+
+        {selectedDate && (
+          <div className="text-sm text-muted-foreground">
+            نمایش لاگ‌های تاریخ: {moment(selectedDate).format('jYYYY/jMM/jDD')}
+          </div>
+        )}
 
         <div className="rounded-md border">
           <Table>
@@ -93,6 +141,7 @@ export default function LoginLogs() {
               <TableRow>
                 <TableHead className="text-right">نام کاربری</TableHead>
                 <TableHead className="text-right">آدرس IP</TableHead>
+                <TableHead className="text-right">نقش کاربر</TableHead>
                 <TableHead className="text-right">مرورگر</TableHead>
                 <TableHead className="text-right">تاریخ</TableHead>
                 <TableHead className="text-right">ساعت</TableHead>
@@ -101,13 +150,13 @@ export default function LoginLogs() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
+                  <TableCell colSpan={6} className="text-center py-8">
                     در حال بارگذاری...
                   </TableCell>
                 </TableRow>
               ) : filteredLogs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
+                  <TableCell colSpan={6} className="text-center py-8">
                     هیچ لاگ ورودی یافت نشد
                   </TableCell>
                 </TableRow>
@@ -120,6 +169,7 @@ export default function LoginLogs() {
                       <TableCell className="font-mono text-sm">
                         {log.ipAddress || "نامشخص"}
                       </TableCell>
+                      <TableCell className="font-medium">{getRoleName(log.role)}</TableCell>
                       <TableCell>{getBrowserInfo(log.userAgent)}</TableCell>
                       <TableCell className="font-medium">{date}</TableCell>
                       <TableCell className="font-mono">{time}</TableCell>
@@ -131,10 +181,10 @@ export default function LoginLogs() {
           </Table>
         </div>
 
-        {data && data.totalPages > 1 && (
+        {data && totalPages > 1 && !selectedDate && !search && (
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              صفحه {page} از {data.totalPages} ({data.total} رکورد)
+              صفحه {page} از {totalPages} ({totalRecords} رکورد)
             </div>
             <div className="flex gap-2">
               <Button
@@ -149,8 +199,8 @@ export default function LoginLogs() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setPage(p => Math.min(data.totalPages, p + 1))}
-                disabled={page === data.totalPages}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
               >
                 بعدی
                 <ChevronLeft className="h-4 w-4 mr-1" />
