@@ -2600,8 +2600,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               // چک کردن موجودی کافی
               if (currentBalance >= orderAmount) {
-                // تغییر وضعیت سفارش به تایید شده
-                await storage.updateOrderStatus(order.id, 'confirmed', order.sellerId);
+                // تغییر وضعیت سفارش به در انتظار تایید
+                await storage.updateOrderStatus(order.id, 'pending', order.sellerId);
                 
                 // ثبت تراکنش کسر موجودی
                 const { nanoid } = await import('nanoid');
