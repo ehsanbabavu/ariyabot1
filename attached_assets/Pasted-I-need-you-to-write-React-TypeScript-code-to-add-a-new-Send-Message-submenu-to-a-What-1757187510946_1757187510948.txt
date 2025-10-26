@@ -1,0 +1,62 @@
+I need you to write React/TypeScript code to add a new "Send Message" (ارسال پیام) submenu to a WhatsApp section in an application. Please use the following requirements and the provided source code as a foundation.
+
+Core Requirements:
+New Submenu Item: Add a new item to the WhatsApp menu/sidebar named "Send Message" (ارسال پیام). The Persian name should be used for display.
+
+API Token Source: The functionality must retrieve the WhatsApp API token from the application's settings/connection section. Assume this token is stored on a User object as apiToken (as seen in the provided code).
+
+Primary Function: This new section will be a form for sending a message to a specific phone number. It should not be a chat interface like the provided ChatWindow component, but rather a single message dispatch form.
+
+Leverage Provided Code: Use the API endpoints, helper functions (like colorFromId), and styling patterns from the provided ChatWindow component code to ensure consistency.
+
+Implementation Details:
+Data Source:
+
+The API token must be fetched from the current user's settings. Use the getUserById function (from '../../db/index') to get the latest user data, just like the fetchMessages function does in the provided code.
+
+Use the same API_SEND_URL ("https://api.whatsiplus.com/sendMsg/") for sending the message.
+
+UI/UX Specifications:
+
+Component Name: Please name the main component SendMessagePanel.
+
+Persian Language: All text labels, placeholders, and buttons should be in Persian (Farsi).
+
+Styling: Use the same Tailwind CSS classes and design language (gradients, rounded buttons, etc.) as the provided ChatWindow component for a consistent look and feel.
+
+The input field should use classes like: "w-full px-4 py-3 bg-gray-100 border-2 border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white transition"
+
+The send button should use classes like: "bg-gradient-to-br from-purple-500 to-indigo-600 text-white p-3 rounded-full hover:scale-110 transition-transform duration-200"
+
+Form Fields: The form should have two main input fields:
+
+Phone Number (شماره همراه): A text input for the recipient's phone number (the phonenumber parameter for the API).
+
+Message Text (متن پیام): A textarea for the message content (the message parameter for the API).
+
+Functionality: Upon form submission, the code should:
+
+Prevent the default form action.
+
+Get the latest user data to access the current apiToken.
+
+Construct the API URL using API_SEND_URL, the token, and the encoded values from the form fields.
+
+Use fetch to call the API.
+
+Display a success or error message to the user based on the API's response.
+
+State Management: Use React's useState for:
+
+phoneNumber (string)
+
+messageText (string)
+
+isLoading (boolean) - to show a loading indicator during API call.
+
+error (string) - to display any errors (e.g., "توکن API تنظیم نشده است").
+
+successMessage (string) - to confirm a successful send.
+
+Provided Source Code Context:
+Here is the relevant code snippet for inspiration regarding API calls, state handling, and styling. Please create the new SendMessagePanel component in a similar style.

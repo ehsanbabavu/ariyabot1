@@ -1,0 +1,59 @@
+import { GoogleGenAI } from "@google/genai";
+
+// فرض می‌شود که توکن API سرویس واتس‌اپ شما در دسترس است
+const WHATSAPP_API_TOKEN = "YOUR_WHATSAPP_API_TOKEN"; 
+const WHATSAPP_SEND_URL = "https://api.whatsiplus.com/sendMsg/";
+
+/**
+ * یک پاسخ هوشمند برای پیام ورودی ایجاد کرده و آن را از طریق واتس‌اپ ارسال می‌کند.
+ * @param userMessage پیام دریافت شده از کاربر
+ * @param recipientPhoneNumber شماره موبایل گیرنده برای ارسال پاسخ
+ */
+async function generateAndSendAiReply(userMessage: string, recipientPhoneNumber: string): Promise<void> {
+  try {
+    // ۱. مقداردهی اولیه کلاینت Google AI با استفاده از کلید API از متغیرهای محیطی
+    // طبق دستورالعمل، API_KEY باید از process.env.API_KEY خوانده شود.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+    // ۲. ایجاد یک پرامپت (دستور) برای مدل هوش مصنوعی
+    const prompt = `You are a helpful assistant. Please provide a short and friendly response to the following message: "${userMessage}"`;
+
+    // ۳. تولید محتوا با استفاده از مدل Gemini
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
+    
+    // استخراج متن پاسخ
+    const aiReply = response.text;
+
+    if (!aiReply) {
+      console.log("AI did not generate a reply.");
+      return;
+    }
+
+    // ۴. ارسال پاسخ تولید شده توسط هوش مصنوعی از طریق API واتس‌اپ
+    const sendUrl = `${WHATSAPP_SEND_URL}${WHATSAPP_API_TOKEN}?phonenumber=${recipientPhoneNumber}&message=${encodeURIComponent(aiReply)}`;
+    
+    console.log(`Attempting to send message via URL: ${sendUrl}`);
+    const sendResponse = await fetch(sendUrl, { method: 'GET' });
+
+    if (sendResponse.ok) {
+      console.log(`Successfully sent AI reply to ${recipientPhoneNumber}: "${aiReply}"`);
+    } else {
+      const errorText = await sendResponse.text();
+      console.error(`Failed to send WhatsApp message to ${recipientPhoneNumber}:`, errorText);
+    }
+
+  } catch (error) {
+    console.error("An error occurred in the AI reply process:", error);
+  }
+}
+
+// --- نمونه استفاده ---
+// به این صورت می‌توانید از این تابع هنگام دریافت یک پیام جدید استفاده کنید.
+const incomingMessage = "سلام، ساعات کاری شما چه زمانی است؟";
+const senderPhoneNumber = "+989123456789";
+
+// فراخوانی تابع برای ارسال پاسخ
+// generateAndSendAiReply(incomingMessage, senderPhoneNumber);
